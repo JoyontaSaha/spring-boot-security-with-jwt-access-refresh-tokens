@@ -10,6 +10,7 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -24,16 +25,17 @@ import java.util.List;
 public class UserServiceImpl implements UserService, UserDetailsService {
     private final UserRepo userRepo;
     private final RoleRepo roleRepo;
+    private final PasswordEncoder passwordEncoder;
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         User user = userRepo.findByUsername(username);
         if(user == null) {
-            String userNotFoundErrorMessage = String.format("User not found in the database: {}", username);
+            String userNotFoundErrorMessage = String.format("User not found in the database: %s", username);
             log.error(userNotFoundErrorMessage);
             throw new UsernameNotFoundException(userNotFoundErrorMessage);
         } else {
-            String userFoundMessage = String.format("User found in the database: {}", username);
+            String userFoundMessage = String.format("User found in the database: %s", username);
             log.info(userFoundMessage);
         }
 
@@ -41,12 +43,14 @@ public class UserServiceImpl implements UserService, UserDetailsService {
         user.getRoles().forEach(role ->
                 authorities.add(new SimpleGrantedAuthority(role.getName())));
 
+        log.info("authorities: {}", authorities);
         return new org.springframework.security.core.userdetails.User(user.getUsername(), user.getPassword(), authorities);
     }
 
     @Override
     public User saveUser(User user) {
         log.info("Saving user {} to the database", user.getName());
+        user.setPassword(passwordEncoder.encode(user.getPassword()));
         return userRepo.save(user);
     }
 

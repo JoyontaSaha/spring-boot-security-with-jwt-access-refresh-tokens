@@ -1,5 +1,6 @@
 package com.joyonta.springbootsecuritywithjwtaccessrefreshtokens.security;
 
+import com.joyonta.springbootsecuritywithjwtaccessrefreshtokens.filter.CustomAuthenticationFilter;
 import lombok.AllArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -32,7 +33,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         http.csrf().disable(); // enable this for browser based system service to avoid csrf attacks
         http.sessionManagement().sessionCreationPolicy(STATELESS);
         http.authorizeRequests().anyRequest().permitAll(); // allow everyone to access this application
-        http.addFilter(new UsernamePasswordAuthenticationFilter(authenticationManagerBean()));
+        http.addFilter(new CustomAuthenticationFilter(authenticationManagerBean()));
 
     }
 
