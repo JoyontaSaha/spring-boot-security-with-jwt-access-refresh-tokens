@@ -1,6 +1,7 @@
 package com.joyonta.springbootsecuritywithjwtaccessrefreshtokens.security;
 
 import com.joyonta.springbootsecuritywithjwtaccessrefreshtokens.filter.CustomAuthenticationFilter;
+import com.joyonta.springbootsecuritywithjwtaccessrefreshtokens.filter.CustomAuthorizationFilter;
 import lombok.AllArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -12,6 +13,7 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 import static org.springframework.security.config.http.SessionCreationPolicy.STATELESS;
 
@@ -34,11 +36,12 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
         http.csrf().disable(); // enable this for browser based system service to avoid csrf attacks
         http.sessionManagement().sessionCreationPolicy(STATELESS);
-        http.authorizeRequests().antMatchers("/api/login/**").permitAll();
+        http.authorizeRequests().antMatchers("/api/login/**", "/api/token/refresh/**", "/api/test/**").permitAll();
         http.authorizeRequests().antMatchers(HttpMethod.GET, "/api/users/**").hasAnyAuthority("ROLE_USER");
         http.authorizeRequests().antMatchers(HttpMethod.POST, "/api/user/save/**").hasAnyAuthority("ROLE_ADMIN");
-        http.authorizeRequests().anyRequest().authenticated(); // allow everyone to access this application
+        http.authorizeRequests().anyRequest().authenticated();
         http.addFilter(customAuthenticationFilter);
+        http.addFilterBefore(new CustomAuthorizationFilter(), UsernamePasswordAuthenticationFilter.class);
 
     }
 
