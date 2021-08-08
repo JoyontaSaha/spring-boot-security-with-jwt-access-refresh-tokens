@@ -17,6 +17,7 @@ public class SpringBootSecurityWithJwtAccessRefreshTokensApplication {
 
 	public static void main(String[] args) {
 		SpringApplication.run(SpringBootSecurityWithJwtAccessRefreshTokensApplication.class, args);
+		System.out.println("******************Completed**************");
 	}
 
 	@Bean
